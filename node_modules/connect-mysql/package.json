@@ -1,0 +1,24 @@
+{
+  "author": "Nathan LaFreniere <nlf@andyet.net>",
+  "contributors": [
+    "Anton Skshidlevsky <meefik@gmail.com>",
+    "Jason Gerfen <jason.gerfen@gmail.com>"
+  ],
+  "name": "connect-mysql",
+  "description": "a MySQL session store for connect",
+  "version": "v4.0.0",
+  "homepage": "https://github.com/nlf/connect-mysql",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nlf/connect-mysql.git"
+  },
+  "main": "./index.js",
+  "dependencies": {
+    "kruptein": "^2.0.7",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">6"
+  }
+}
