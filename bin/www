@@ -4,7 +4,8 @@
  * Module dependencies.
  */
 
-var app = require('../teamProject424');
+var app = require('../team-project');
+
 var debug = require('debug')('finalproject:server');
 var http = require('http');
 

@@ -6,12 +6,21 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "connect-mysql": "^4.0.0",
+    "connect-mysql2": "^2.2.6",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "ejs": "^3.1.10",
     "express": "~4.16.1",
+    "express-mysql-session": "^3.0.3",
+    "express-session": "^1.18.2",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.15.3",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-google-oidc": "^0.1.0"
   }
 }
