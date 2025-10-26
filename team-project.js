@@ -108,11 +108,13 @@ passport.deserializeUser(function(user, cb) {
 //importing routes (AFTER passport is configured)
 var authRouter = require('./routes/auth');
 var dashboardRouter = require('./routes/dashboard');
+var notesRouter = require('./routes/notes');
 //end of importing routes
 
 //mounting routes
 app.use('/', authRouter);
 app.use('/dashboard', dashboardRouter);
+app.use('/notes', notesRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

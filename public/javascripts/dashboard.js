@@ -126,7 +126,7 @@ function closeModal() {
 }
 
 // Save note (create or update)
-function saveNote(event) {
+async function saveNote(event) {
     event.preventDefault();
     
     const title = document.getElementById('noteTitle').value;
@@ -135,14 +135,37 @@ function saveNote(event) {
 
     if (currentNoteId) {
         // Update existing note
-        const note = notes.find(n => n.id === currentNoteId);
+        const response = await fetch(`/notes/${currentNoteId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ content })
+        })
+
+        const updatedNote = await response.json()
+        const note = notes.find(n => n.id === currentNoteId); // is this needed for the frontend to run smoothly?
+
+        /*
         note.title = title;
         note.content = content;
         note.category = category;
         note.date = new Date().toISOString();
+        */
     } else {
         // Create new note
-        const newNote = {
+        const response = await fetch("/notes", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content, user_id: 1/* pass in user_id here*/ })
+        })
+
+        const newNote = await response.json()
+        notes.unshift(newNote);
+
+        /*{
             id: Date.now(),
             title,
             content,
@@ -150,7 +173,7 @@ function saveNote(event) {
             pinned: false,
             date: new Date().toISOString()
         };
-        notes.unshift(newNote);
+        */
     }
 
     closeModal();
