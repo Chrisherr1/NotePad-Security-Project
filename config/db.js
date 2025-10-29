@@ -21,11 +21,11 @@ async function getUserNotes(id) {
 }
 
 // create a note 
-async function createNote(note, id) {
+async function createNote(title, content, category, id) {
     const result = await pool.query(`
-        INSERT INTO notes (note, user_id)
-        VALUES (?, ?)
-        `, [note, id])
+        INSERT INTO notes (title, content, category, user_id)
+        VALUES (?, ?, ?, ?)
+        `, [title, content, category, id])
     return result;
 } 
 

@@ -140,18 +140,19 @@ async function saveNote(event) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ content })
+            body: JSON.stringify({ title, content, category })
         })
 
         const updatedNote = await response.json()
-        const note = notes.find(n => n.id === currentNoteId); // is this needed for the frontend to run smoothly?
 
         /*
+        const note = notes.find(n => n.id === currentNoteId); // is this needed for the frontend to run smoothly?
         note.title = title;
         note.content = content;
         note.category = category;
         note.date = new Date().toISOString();
         */
+        
     } else {
         // Create new note
         const response = await fetch("/notes", {
@@ -159,13 +160,13 @@ async function saveNote(event) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ content, user_id: 1/* pass in user_id here*/ })
+            body: JSON.stringify({ title, content, category })
         })
-
         const newNote = await response.json()
         notes.unshift(newNote);
-
-        /*{
+        
+        /*
+        const newNote = {
             id: Date.now(),
             title,
             content,
@@ -182,6 +183,7 @@ async function saveNote(event) {
 }
 
 // Edit note
+// is this needed? I noticed it's not in dashboard.ejs
 function editNote(id) {
     openModal(id);
 }
@@ -189,7 +191,8 @@ function editNote(id) {
 // Delete note
 function deleteNote(id) {
     if (confirm('Delete this note?')) {
-        notes = notes.filter(n => n.id !== id);
+        
+        // notes = notes.filter(n => n.id !== id);
         updateCounts();
         renderNotes();
     }

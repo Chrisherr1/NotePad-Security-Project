@@ -26,12 +26,11 @@ router.get("/notes", async (req, res) => {
 })
 
 // allows user to add a note
-router.post("/notes", async (req, res) => {
+router.post("/", async (req, res) => {
     try {
-        console.log('Post block reached')
-        const { note, id } = req.body
-        const notes = await createNote(note, id)
-        res.status(201).send(notes)
+        const { title, content, category, id } = req.body
+        const note = await db.createNote(title, content, category, id)
+        res.status(201).send(note)
     } catch (error) {
         console.error('Could not create note:', error)
         res.status(500)
@@ -43,7 +42,7 @@ router.put("/notes/:id", async (req, res) => {
     try {
         const id = req.params.id
         const { note } = req.body
-        const notes = await updateNote(note, id)
+        const notes = await db.updateNote(note, id)
         res.status(201).send(notes)
     } catch (error) {
         console.error('Could not update note:', error)
@@ -55,7 +54,7 @@ router.put("/notes/:id", async (req, res) => {
 router.delete("/notes/:id", async (req, res) => {
     try {
         const id = req.params.id
-        const result = await deleteNote(id)
+        const result = await db.deleteNote(id)
         res.status(201).send(result)
     } catch (error) {
         console.error('Could not delete note:', error)
