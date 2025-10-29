@@ -13,7 +13,9 @@ CREATE TABLE users (
 -- Create notes table
 CREATE TABLE notes (
     note_id INT AUTO_INCREMENT,
-    note VARCHAR(255),
+    title VARCHAR(25),
+    content VARCHAR(255),
+    category VARCHAR(25),
     user_id INT,
     PRIMARY KEY (note_id),
     FOREIGN KEY (user_id) 
