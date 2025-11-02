@@ -3,8 +3,8 @@ let currentNoteId = null;
 let currentFilter = 'all';
 
 // Initialize the app
-function initNotes() {
-    notes = [];
+async function initNotes() {
+    notes = await getNotes();
     updateCounts();
     renderNotes();
 }
@@ -20,7 +20,7 @@ function updateCounts() {
 }
 
 // Render notes to the DOM
-function renderNotes() {
+async function renderNotes() {
     const list = document.getElementById('notesList');
     let filteredNotes = [...notes];
 
@@ -55,14 +55,14 @@ function renderNotes() {
 
     // Render note items
     list.innerHTML = filteredNotes.map(note => `
-        <div class="note-item" data-note-id="${note.id}">
+        <div class="note-item" data-note-id="${note.note_id}">
             <div class="note-item-header">
                 <div class="note-item-title">${note.title}</div>
                 <div class="note-item-actions">
-                    <button class="icon-btn pin-btn" data-note-id="${note.id}" title="${note.pinned ? 'Unpin' : 'Pin'}">
+                    <button class="icon-btn pin-btn" data-note-id="${note.note_id}" title="${note.pinned ? 'Unpin' : 'Pin'}">
                         ${note.pinned ? 'Pinned' : 'Pin'}
                     </button>
-                    <button class="icon-btn delete-btn" data-note-id="${note.id}" title="Delete">
+                    <button class="icon-btn delete-btn" data-note-id="${note.note_id}" title="Delete">
                         Delete
                     </button>
                 </div>
@@ -103,7 +103,7 @@ function openModal(noteId = null) {
     const modalTitle = document.getElementById('modalTitle');
     
     if (noteId) {
-        const note = notes.find(n => n.id === noteId);
+        const note = notes.find(n => n.note_id === noteId);
         modalTitle.textContent = 'Edit Note';
         document.getElementById('noteTitle').value = note.title;
         document.getElementById('noteContent').value = note.content;
@@ -125,8 +125,20 @@ function closeModal() {
     document.getElementById('noteModal').classList.remove('active');
 }
 
+// Get notes
+async function getNotes() {
+    const response = await fetch("/notes", {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    const userNotes = await response.json();
+    return userNotes;
+}
+
 // Save note (create or update)
-function saveNote(event) {
+async function saveNote(event) {
     event.preventDefault();
     
     const title = document.getElementById('noteTitle').value;
@@ -135,21 +147,27 @@ function saveNote(event) {
 
     if (currentNoteId) {
         // Update existing note
-        const note = notes.find(n => n.id === currentNoteId);
-        note.title = title;
-        note.content = content;
-        note.category = category;
-        note.date = new Date().toISOString();
+        //** FIX: doesn't work yet
+        const response = await fetch(`/notes/${currentNoteId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title, content, category })
+        })
+        const updatedNote = await response.json()
+  
     } else {
         // Create new note
-        const newNote = {
-            id: Date.now(),
-            title,
-            content,
-            category,
-            pinned: false,
-            date: new Date().toISOString()
-        };
+        //** FIX: user_id isn't being passed to database
+        const response = await fetch("/notes", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ title, content, category })
+        })
+        const newNote = await response.json()
         notes.unshift(newNote);
     }
 
@@ -159,14 +177,23 @@ function saveNote(event) {
 }
 
 // Edit note
+// isn't there an editNote function already in saveNote?
 function editNote(id) {
     openModal(id);
 }
 
 // Delete note
-function deleteNote(id) {
+//** FIX: doesn't work yet
+async function deleteNote(id) {
     if (confirm('Delete this note?')) {
-        notes = notes.filter(n => n.id !== id);
+        //notes = notes.filter(n => n.id !== id);
+        const response = await fetch(`/notes/${id}`, {
+            method: 'DELETE',
+            headers: {
+            'Content-Type': 'application/json',
+            }
+        })
+
         updateCounts();
         renderNotes();
     }
@@ -214,7 +241,6 @@ function logout() {
 
 // Event listeners
 document.getElementById('searchBox').addEventListener('input', renderNotes);
-
 document.getElementById('noteModal').addEventListener('click', function(e) {
     if (e.target === this) closeModal();
 });
