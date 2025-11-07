@@ -1,25 +1,22 @@
-require('dotenv').config(); 
-// Load environment variables from .env file
+require('dotenv').config();
+// Load environment constiables from .env file
 
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const path = require('path');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
 
-//passport setup
-var passport = require('passport');
-var GoogleStrategy = require('passport-google-oidc').Strategy;
-var db = require('./config/db');  // Adjust path if your db file is elsewhere
-//end of passport setup
-
-//session store setup
-var session = require('express-session');
-var MySQLStore = require('express-mysql-session')(session);
-//end of session store setup
+const express = require('express');
+const passportSetup = require('./config/passport-setup');
+const db = require('./config/db');
 
 //initializing express app
-var app = express();
+const app = express();
+
+//session store setup
+const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+//end of session store setup
 
 // view engine setup
 // tells express what template engine we are using(html,ejs,pug) and where the template files are located
@@ -35,7 +32,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //engine setup for sessions google OAuth
-var sessionStore = new MySQLStore({
+const sessionStore = new MySQLStore({
   host: process.env.MYSQL_HOST || 'localhost',
   port: 3306,
   user: process.env.MYSQL_USER || 'root',
@@ -51,66 +48,14 @@ app.use(session({
 }));
 
 // Initialize Passport
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passportSetup.initialize());
+app.use(passportSetup.session());
 
-//configure passport google strategy
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: '/oauth2/redirect/google',
-  scope: ['profile']
-}, function verify(issuer, profile, cb) {
-  db.query('SELECT * FROM federated_credentials WHERE provider = ? AND subject = ?', [issuer, profile.id])
-    .then(([rows]) => {
-      if (rows.length === 0) {
-        // New user - create user and federated credential
-        return db.query('INSERT INTO users (name) VALUES (?)', [profile.displayName])
-          .then(([result]) => {
-            var userId = result.insertId;
-            return db.query('INSERT INTO federated_credentials (user_id, provider, subject) VALUES (?, ?, ?)', [userId, issuer, profile.id])
-              .then(() => {
-                var user = {
-                  user_id: userId,  // Changed from id to user_id
-                  name: profile.displayName
-                };
-                return cb(null, user);
-              });
-          });
-      } else {
-        // Existing user - fetch user data
-        var row = rows[0];
-        return db.query('SELECT * FROM users WHERE user_id = ?', [row.user_id])  // Changed from id to user_id
-          .then(([userRows]) => {
-            if (userRows.length === 0) {
-              return cb(null, false);
-            }
-            return cb(null, userRows[0]);
-          });
-      }
-    })
-    .catch(err => {
-      return cb(err);
-    });
-}));
-
-// Passport serialization
-passport.serializeUser(function(user, cb) {
-  process.nextTick(function() {
-    cb(null, { user_id: user.user_id, name: user.name });  // Changed from id to user_id
-  });
-});
-
-passport.deserializeUser(function(user, cb) {
-  process.nextTick(function() {
-    return cb(null, user);
-  });
-});
 
 //importing routes (AFTER passport is configured)
-var authRouter = require('./routes/auth');
-var dashboardRouter = require('./routes/dashboard');
-var notesRouter = require('./routes/notes');
+const authRouter = require('./routes/auth');
+const dashboardRouter = require('./routes/dashboard');
+const notesRouter = require('./routes/notes');
 //end of importing routes
 
 //mounting routes

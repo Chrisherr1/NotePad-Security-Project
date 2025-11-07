@@ -12,13 +12,16 @@ router.get('/', function(req, res, next) {
 });
 
 // route for Google OAuth 2.0 authentication
-router.get('/login/federated/google', passport.authenticate('google'));
+router.get('/google', passport.authenticate('google', {
+  scope: ['profile', 'email']
+}));
 
 // callback route after Google authentication
-router.get('/oauth2/redirect/google', passport.authenticate('google', {
+router.get('/google/redirect', passport.authenticate('google',{
   successRedirect: '/dashboard',
   failureRedirect: '/'
 }));
+
 // logout route
 router.post('/logout', function(req, res, next) {
   req.logout(function(err) {
@@ -26,10 +29,5 @@ router.post('/logout', function(req, res, next) {
     res.redirect('/');
   });
 });
-
-// dashboard route
-//router.get('/dashboard', function(req, res, next) {
-  //res.send('Welcome to the dashboard!');
-//});
 
 module.exports = router;
