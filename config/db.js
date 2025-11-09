@@ -15,10 +15,11 @@ module.exports = pool;
 // get notes of user
 async function getUserNotes(id) {
     const [rows] = await pool.query(`
-        SELECT n.title, n.content, n.category
+        SELECT n.note_id, n.title, n.content, n.category
         FROM users u, notes n
         WHERE u.user_id = ?
             AND u.user_id = n.user_id`, [id])
+    console.log(rows)
     return rows
 }
 
@@ -28,15 +29,15 @@ async function createNote(title, content, category, id) {
         INSERT INTO notes (title, content, category, user_id)
         VALUES (?, ?, ?, ?)
         `, [title, content, category, id])
-    return result;
+    return result
 } 
 
 // update a note
 async function updateNote(title, content, category, id) {
     const result = await pool.query(`
         UPDATE notes
-        SET title = ?
-            content = ?
+        SET title = ?,
+            content = ?,
             category = ?
         WHERE note_id = ? 
         `, [title, content, category, id])
@@ -45,6 +46,7 @@ async function updateNote(title, content, category, id) {
 
 // delete a note
 async function deleteNote(id) {
+    console.log("Note id from database file: ", id);
     const result = await pool.query(`
         DELETE FROM notes
         WHERE note_id = ?

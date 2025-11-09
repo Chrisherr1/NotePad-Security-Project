@@ -27,14 +27,15 @@ router.get("/notes", async (req, res) => {
 })
 
 // allows user to add a note
+//** FIX: need to get user_id (user_id is currently being hardcoded into database)
 router.post("/notes", async (req, res) => {
     try {
         const { title, content, category, user_id } = req.body
         const note = await db.createNote(title, content, category, user_id)
-        res.status(201).send(note)
+        res.status(200).send(note)
     } catch (error) {
         console.error('Could not create note:', error)
-        res.status(500)
+        res.status(500).send({ error: 'Could not create note' })
     }
 })
 
@@ -44,25 +45,22 @@ router.put("/notes/:id", async (req, res) => {
         const id = req.params.id
         const { title, content, category } = req.body
         const note = await db.updateNote(title, content, category, id)
-        res.status(201).send(notes)
+        res.status(201).send(note)
     } catch (error) {
         console.error('Could not update note:', error)
-        res.status(500)
+        res.status(500).send({ error: 'Could not update note' })
     }
 })
 
 // allows user to delete a note 
 router.delete("/notes/:id", async (req, res) => {
     try {
-        console.log('Raw req.params:', req.params)
-        console.log("Params being passed:", req.params.id)
-        console.log('Type:', typeof req.params.id)
-        const id = parseInt(req.params.id)
+        const id = parseInt(req.params.id)    
         const result = await db.deleteNote(id)
         res.status(201).send(result)
     } catch (error) {
         console.error('Could not delete note:', error)
-        res.status(500)
+        res.status(500).send({ error: 'Could not delete note' })
     }
     
 })

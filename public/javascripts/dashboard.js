@@ -134,6 +134,7 @@ async function getNotes() {
         }
     })
     const userNotes = await response.json();
+    console.log("Fetched notes:", userNotes);
     return userNotes;
 }
 
@@ -147,7 +148,6 @@ async function saveNote(event) {
 
     if (currentNoteId) {
         // Update existing note
-        //** FIX: doesn't work yet
         const response = await fetch(`/notes/${currentNoteId}`, {
             method: 'PUT',
             headers: {
@@ -156,6 +156,7 @@ async function saveNote(event) {
             body: JSON.stringify({ title, content, category })
         })
         const updatedNote = await response.json()
+        return updatedNote
   
     } else {
         // Create new note
@@ -177,31 +178,31 @@ async function saveNote(event) {
 }
 
 // Edit note
-// isn't there an editNote function already in saveNote?
 function editNote(id) {
     openModal(id);
 }
 
 // Delete note
-//** FIX: doesn't work yet
 async function deleteNote(id) {
+    console.log("Note id from frontend: ", id)
     if (confirm('Delete this note?')) {
         //notes = notes.filter(n => n.id !== id);
+        
         const response = await fetch(`/notes/${id}`, {
             method: 'DELETE',
-            headers: {
-            'Content-Type': 'application/json',
-            }
         })
 
+        const result = await response.json();
+    
         updateCounts();
         renderNotes();
+        return result;
     }
 }
 
 // Toggle pin status
 function togglePin(id) {
-    const note = notes.find(n => n.id === id);
+    const note = notes.find(n => n.note.id === id);
     note.pinned = !note.pinned;
     updateCounts();
     renderNotes();
