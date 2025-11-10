@@ -14,4 +14,7 @@ router.get('/', isAuthenticated, function(req, res, next) {
   res.render('dashboard', { user: req.user });
 });
 
+router
+
+
 module.exports = router;
