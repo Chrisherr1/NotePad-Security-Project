@@ -31,7 +31,7 @@ router.get("/notes", async (req, res) => {
 router.post("/notes", async (req, res) => {
     try {
         const { title, content, category, user_id } = req.body
-        const note = await db.createNote(title, content, category, user_id)
+        const note = await db.createNote(title, content, category, req.user.user_id)
         res.status(200).send(note)
     } catch (error) {
         console.error('Could not create note:', error)
