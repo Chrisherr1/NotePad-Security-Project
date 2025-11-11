@@ -40,7 +40,7 @@ const sessionStore = new MySQLStore({
   database: process.env.MYSQL_DATABASE || '424notes_app'
 });
 
-
+const csrfToken = crypto.randomUUID();
 //session
 app.use(session({
   secret: process.env.COOKIE_SECRET,
@@ -71,9 +71,7 @@ app.use('/', notesRouter);
 
 
 
-
-
-// Added error checking 
+// Added error checking
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

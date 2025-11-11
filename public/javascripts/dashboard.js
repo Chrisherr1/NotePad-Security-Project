@@ -62,7 +62,7 @@ async function renderNotes() {
                     <button class="icon-btn pin-btn" data-note-id="${note.note_id}" title="${note.pinned ? 'Unpin' : 'Pin'}">
                         ${note.pinned ? 'Pinned' : 'Pin'}
                     </button>
-                    <button class="icon-btn delete-btn" data-note-id="${note.note_id}" title="Delete">
+                    <button class="icon-btn delete-btn" data-note-id="${note.note_id}" title="Delete" onclick="location.reload()">
                         Delete
                     </button>
                 </div>

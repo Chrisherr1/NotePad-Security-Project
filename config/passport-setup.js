@@ -30,7 +30,8 @@ passport.deserializeUser(function(user_id, done) {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: '/google/redirect'
+  callbackURL: '/google/redirect',
+  scope:['profile','email']
 }, function verify(issuer, profile, done) {
   db.query('SELECT * FROM federated_credentials WHERE provider = ? AND subject = ?', [issuer, profile.id])
     .then(([rows]) => {
