@@ -145,6 +145,8 @@ async function saveNote(event) {
     const title = document.getElementById('noteTitle').value;
     const content = document.getElementById('noteContent').value;
     const category = document.getElementById('noteCategory').value;
+    const date = new Date().toISOString();
+    
 
     if (currentNoteId) {
         // Update existing note
@@ -160,13 +162,12 @@ async function saveNote(event) {
   
     } else {
         // Create new note
-        //** FIX: user_id isn't being passed to database
         const response = await fetch("/notes", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ title, content, category })
+            body: JSON.stringify({ title, content, category, date })
         })
         const newNote = await response.json()
         notes.unshift(newNote);
@@ -186,8 +187,6 @@ function editNote(id) {
 async function deleteNote(id) {
     console.log("Note id from frontend: ", id)
     if (confirm('Delete this note?')) {
-        //notes = notes.filter(n => n.id !== id);
-        
         const response = await fetch(`/notes/${id}`, {
             method: 'DELETE',
         })

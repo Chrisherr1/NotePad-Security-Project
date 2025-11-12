@@ -15,7 +15,7 @@ module.exports = pool;
 // get notes of user
 async function getUserNotes(id) {
     const [rows] = await pool.query(`
-        SELECT n.note_id, n.title, n.content, n.category
+        SELECT n.note_id, n.title, n.content, n.category, n.date
         FROM users u, notes n
         WHERE u.user_id = ?
             AND u.user_id = n.user_id`, [id])
@@ -24,11 +24,12 @@ async function getUserNotes(id) {
 }
 
 // create a note 
-async function createNote(title, content, category, id) {
+async function createNote(title, content, category, date, id) {
     const result = await pool.query(`
-        INSERT INTO notes (title, content, category, user_id)
-        VALUES (?, ?, ?, ?)
-        `, [title, content, category, id])
+        INSERT INTO notes (title, content, category, date, user_id)
+        VALUES (?, ?, ?, ?, ?)
+        `, [title, content, category, date, id])
+    console.log("Note from sql query: ", result)
     return result
 } 
 

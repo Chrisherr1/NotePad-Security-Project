@@ -27,11 +27,11 @@ router.get("/notes", async (req, res) => {
 })
 
 // allows user to add a note
-//** FIX: need to get user_id (user_id is currently being hardcoded into database)
 router.post("/notes", async (req, res) => {
     try {
-        const { title, content, category, user_id } = req.body
-        const note = await db.createNote(title, content, category, req.user.user_id)
+        const { title, content, category, date, user_id } = req.body
+        const note = await db.createNote(title, content, category, date, req.user.user_id)
+        console.log("Note from routes file: ", note)
         res.status(200).send(note)
     } catch (error) {
         console.error('Could not create note:', error)
