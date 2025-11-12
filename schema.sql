@@ -6,7 +6,7 @@ USE 424notes_app;
 -- Create users table
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT,
-    name VARCHAR(25) NOT NULL,
+    name VARCHAR(50) NOT NULL,
     PRIMARY KEY (user_id)
 );
 
@@ -16,6 +16,7 @@ CREATE TABLE notes (
     title VARCHAR(25),
     content VARCHAR(255),
     category VARCHAR(25),
+    date VARCHAR(255),
     user_id INT,
     PRIMARY KEY (note_id),
     FOREIGN KEY (user_id) 
