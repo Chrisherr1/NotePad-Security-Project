@@ -13,7 +13,7 @@ CREATE TABLE users (
 -- Create notes table
 CREATE TABLE notes (
     note_id INT AUTO_INCREMENT,
-    title VARCHAR(25),
+    title VARCHAR(255),
     content VARCHAR(255),
     category VARCHAR(25),
     date VARCHAR(255),

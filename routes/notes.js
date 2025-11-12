@@ -55,7 +55,7 @@ router.put("/notes/:id", async (req, res) => {
 // allows user to delete a note 
 router.delete("/notes/:id", async (req, res) => {
     try {
-        const id = parseInt(req.params.id)    
+        const id = parseInt(req.params.id)
         const result = await db.deleteNote(id)
         res.status(201).send(result)
     } catch (error) {
