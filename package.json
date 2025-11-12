@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "devStart" : "nodemon team-project.js"
+    "devStart": "nodemon team-project.js"
   },
   "dependencies": {
     "connect-mysql": "^4.0.0",
     "connect-mysql2": "^2.2.6",
     "cookie-parser": "~1.4.4",
+    "cookie-session": "^2.1.1",
     "debug": "~2.6.9",
     "ejs": "^3.1.10",
     "express": "~4.16.1",
