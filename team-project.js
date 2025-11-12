@@ -1,7 +1,7 @@
 // Load environment variables from .env file
 require('dotenv').config(); 
 
-//to delete?
+
 const createError = require('http-errors');
 const path = require('path');
 const logger = require('morgan');
@@ -49,6 +49,7 @@ app.use(session({
   store: sessionStore,
   cookie: {
   httpOnly: true,
+  secure:true,
   sameSite: 'lax',
   maxAge: 1000 * 60 * 30
   }
