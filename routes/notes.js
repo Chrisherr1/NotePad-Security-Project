@@ -19,7 +19,7 @@ router.use(isAuthenticated)
 
 // gets user notes
 router.get("/notes", async (req, res) => {
-    try {   
+    try { 
         const id = req.user.user_id
         const notes = await db.getUserNotes(id) 
         res.send(notes)
@@ -45,8 +45,8 @@ router.post("/notes",csrfSynchronisedProtection, async (req, res) => {
 router.put("/notes/:id",csrfSynchronisedProtection, async (req, res) => {
     try {
         const id = req.params.id
-        const { title, content, category } = req.body
-        const note = await db.updateNote(title, content, category, id)
+        const { title, content, category,pinned } = req.body
+        const note = await db.updateNote(title, content, category,pinned, id)
         res.status(201).send(note)
     } catch (error) {
         console.error('Could not update note:', error)

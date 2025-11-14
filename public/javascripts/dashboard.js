@@ -169,8 +169,6 @@
                 body: JSON.stringify({ title, content, category })
             })
             const updatedNote = await response.json()
-            return updatedNote
-    
         } else {
             // Create new note
             const response = await fetch("/notes", {
@@ -184,7 +182,7 @@
             const newNote = await response.json()
             notes.unshift(newNote);
         }
-
+        notes = await getNotes();
         closeModal();
         updateCounts();
         renderNotes();
@@ -215,12 +213,32 @@
     }
 
     // Toggle pin status
-    function togglePin(id) {
-        const note = notes.find(n => n.note.id === id);
-        note.pinned = !note.pinned;
-        updateCounts();
-        renderNotes();
-    }
+    async function togglePin(id) {
+    const note = notes.find(n => n.note_id === id);
+    if (!note) return;
+    
+    const newPinnedState = !note.pinned;
+    
+    // Save to backend
+    await fetch(`/notes/${id}`, {
+        method: 'PUT',
+        headers: {
+            'x-csrf-token': csrfToken,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+            title: note.title,
+            content: note.content,
+            category: note.category,
+            pinned: newPinnedState
+        })
+    });
+    
+    // Reload notes from server
+    notes = await getNotes();
+    updateCounts();
+    renderNotes();
+}
 
     // Filter notes by category or view
     function filterNotes(filter, element) {

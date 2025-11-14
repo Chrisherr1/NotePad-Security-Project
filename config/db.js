@@ -15,7 +15,7 @@ module.exports = pool;
 // get notes of user
 async function getUserNotes(id) {
     const [rows] = await pool.query(`
-        SELECT n.note_id, n.title, n.content, n.category, n.date
+        SELECT n.note_id, n.title, n.content, n.category, n.date , n.pinned
         FROM users u, notes n
         WHERE u.user_id = ?
             AND u.user_id = n.user_id`, [id])
@@ -34,14 +34,15 @@ async function createNote(title, content, category, date, id) {
 } 
 
 // update a note
-async function updateNote(title, content, category, id) {
+async function updateNote(title, content, category,pinned, id) {
     const result = await pool.query(`
         UPDATE notes
         SET title = ?,
             content = ?,
-            category = ?
-        WHERE note_id = ? 
-        `, [title, content, category, id])
+            category = ?,
+            pinned = ?
+        WHERE note_id = ?
+        `, [title, content, category,pinned, id])
     return result
 }
 

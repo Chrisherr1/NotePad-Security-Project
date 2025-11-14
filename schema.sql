@@ -17,6 +17,7 @@ CREATE TABLE notes (
     content VARCHAR(255),
     category VARCHAR(25),
     date VARCHAR(255),
+	pinned BOOLEAN DEFAULT FALSE,
     user_id INT,
     PRIMARY KEY (note_id),
     FOREIGN KEY (user_id) 

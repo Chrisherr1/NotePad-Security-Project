@@ -21,7 +21,7 @@ const MySQLStore = require('express-mysql-session')(session);
 
 const { csrfSynchronisedProtection, generateToken } = require('./middleware/csrf');
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
+
 
 // view engine setup
 // tells express what template engine we are using(html,ejs,pug) and where the template files are located
@@ -29,6 +29,16 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 //middleware setup
+
+
+app.use((req, res, next) => {
+     //protects from browser misinterpreting file types
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    //protects from clickjacking(via embedded in iframes)
+    res.setHeader('Content-Security-Policy', "frame-ancestors 'none'");
+    next();
+});
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -57,9 +67,6 @@ app.use(session({
   maxAge: 1000 * 60 * 30
   }
 }));
-// Configure body-parser middleware to parse request bodies (for POST data)
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
 
 // Initialize Passport
 app.use(passportSetup.initialize());
