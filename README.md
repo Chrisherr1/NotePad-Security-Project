@@ -8,3 +8,7 @@
 6. Run the server: `npm start`
 
 **Never commit your `.env` file or SSL certificates!**
+![alt text](readme-photos/image.png)
+![alt text](readme-photos/image-1.png)
+![alt text](readme-photos/image-2.png)
+![alt text](readme-photos/image-3.png)
