@@ -1,4 +1,4 @@
-# Final Project
+# Notepad
 
 A Node.js web application using Express, MySQL, Passport (Google OAuth), and EJS.
 
