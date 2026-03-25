@@ -1,74 +1,77 @@
-require('dotenv').config();
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oidc').Strategy;
-const db = require('./db');
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oidc';
+import AuthService from '../services/AuthService.js';
+import UserRepository from '../repository/UserRepository.js';
 
-
-// Passport serialization
+/*
+    serializeUser - determines what data is saved in the session
+    after a user logs in, passport calls this to decide what to store in the session
+    we only store the user_id to keep the session small
+    the user_id is what gets saved to req.session
+*/
 passport.serializeUser(function(user, done) {
-  process.nextTick(function() {
-   done(null, user.user_id);  // Save only the user_id to the session
-  });
-}); 
-passport.deserializeUser(function(user_id, done) {
-  process.nextTick(function() {
-    //  Query database to get full user object
-    db.query('SELECT * FROM users WHERE user_id = ?', [user_id])
-      .then(([rows]) => {
-        if (rows.length === 0) {
-          return done(null, false);
-        }
-        return done(null, rows[0]);
-      })
-      .catch(err => {
-        return done(err);
-      });
-  });
-});
-//configure passport google strategy
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: '/google/redirect',
-  scope:['profile','email']
-}, function verify(issuer, profile, done) {
-  db.query('SELECT * FROM federated_credentials WHERE provider = ? AND subject = ?', [issuer, profile.id])
-    .then(([rows]) => {
-      if (rows.length === 0) {
-        // New user - create user and federated credential
-        return db.query('INSERT INTO users (name) VALUES (?)', [profile.displayName])
-          .then(([result]) => {
-            var userId = result.insertId;
-            return db.query('INSERT INTO federated_credentials (user_id, provider, subject) VALUES (?, ?, ?)', [userId, issuer, profile.id])
-              .then(() => {
-                var user = {
-                  user_id: userId,  // Changed from id to user_id
-                  name: profile.displayName
-                  
-                };
-                return done(null, user);
-              });
-          });
-      } else {
-        // Existing user - fetch user data
-        var row = rows[0];
-        return db.query('SELECT * FROM users WHERE user_id = ?', [row.user_id])  // Changed from id to user_id
-          .then(([userRows]) => {
-            if (userRows.length === 0) {
-              return done(null, false);
-            }
-            return done(null, userRows[0]);
-          });
-      }
-    })
-    .catch(err => {
-      return done(err);
+    process.nextTick(function() {
+        done(null, user.user_id);
     });
+});
+
+/*
+    deserializeUser - runs on every request after the user is logged in
+    passport takes the user_id we saved in the session and uses it to fetch the full user object
+    the full user object is then attached to req.user on every request
+    if the user is not found in the database, we return false to log them out
+*/
+passport.deserializeUser(function(user_id, done) {
+    process.nextTick(async function() {
+        try {
+            const user = await UserRepository.findById(user_id);
+            if(!user) {
+                return done(null, false);
+            }
+            return done(null, user);
+        } catch(err) {
+            return done(err);
+        }
+    });
+});
+
+/*
+    GoogleStrategy - configures passport to use Google OAuth
+    clientID and clientSecret are from Google Cloud Console
+    callbackURL is where Google redirects after authentication
+    scope tells Google what information we want access to (profile and email)
+*/
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:8080/api/v1/auth/google/redirect',
+    scope: ['profile', 'email']
+}, 
+/*
+    verify - called by passport after Google authenticates the user
+    issuer - the URL of the identity provider (Google's URL)
+    profile - the user's Google profile (id, displayName, emails, etc)
+    done - callback to tell passport if authentication succeeded or failed
+    we pass the logic to AuthService.googleAuth to keep this file clean
+*/
+async function verify(issuer, profile, done) {
+    try {
+        const user = await AuthService.googleAuth(issuer, profile);
+        return done(null, user);
+    } catch(err) {
+        return done(err);
+    }
 }));
-// logic for forcing user to choose account after logout
-GoogleStrategy.prototype.authorizationParams = function (options) {
-  return {
-    prompt: 'select_account'
-  };
+
+/*
+    authorizationParams - forces Google to show the account selection screen
+    this ensures the user can switch accounts after logging out
+    without this, Google would automatically log in with the last used account
+*/
+GoogleStrategy.prototype.authorizationParams = function(options) {
+    return {
+        prompt: 'select_account'
+    };
 };
-module.exports = passport;
+
+export default passport;

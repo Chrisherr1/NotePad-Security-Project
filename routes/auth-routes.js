@@ -1,58 +1,40 @@
-// Importing express
-var express = require('express');
-// Creating router
-var router = express.Router();
-// Importing passport
-var passport = require('passport');
-
-const { loginUser, createUser } = require('../config/login');
+import express from 'express';
+import passport from 'passport';
+import AuthController from '../controllers/AuthController.js';
+import { loginLimiter } from '../middleware/rateLimiter.js';
+import { isAuthenticated } from '../middleware/auth.js';
 
 
-// rendering the login page
-router.get('/', (req, res) => {
-  res.render('login');
+
+const authRoutes = express.Router();
+
+// gives client url to serve the frontend after google redirects user to dashboard
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:8080';
+
+// login route
+authRoutes.post('/login', loginLimiter, AuthController.login);
+
+// get current logged in user
+authRoutes.get('/user', isAuthenticated, (req, res) => {
+    res.json(req.user);
 });
 
-//router for login
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  const user = await loginUser(email, password);
-
-  req.login(user, (err) => {
-    res.json({ success: true, message: 'Login successful' });
-  });
-});
-
-//router for signup
-router.post('/signup', async (req, res) => {
-  const { name, email, password } = req.body;
-  
-  await createUser(name, email, password);
-  res.json({ success: true, message: 'Account created successfully' });
-});
+// signup route
+authRoutes.post('/signup', AuthController.signup);
 
 // route for Google OAuth 2.0 authentication
-router.get('/google', passport.authenticate('google', {
-  scope: ['profile','email'],
-  prompt:'select_account'
+authRoutes.get('/google', passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    prompt: 'select_account'
 }));
 
 // callback route after Google authentication
-router.get('/google/redirect', passport.authenticate('google', {
-  successRedirect: '/dashboard',
-  failureRedirect: '/'
+authRoutes.get('/google/redirect', passport.authenticate('google', {
+    successRedirect: `${CLIENT_URL}/dashboard.html`,
+    failureRedirect: `${CLIENT_URL}/index.html`
 }));
 
 // logout route
-router.post('/logout', function(req, res, next) {
-  req.logout(function(err) {
-    if (err) { return next(err); }
-    req.session.destroy(function(err) {
-      if(err) { return next(err); }
-      res.clearCookie('connect.sid');
-      res.redirect('/');
-    });
-  });
-});
+authRoutes.post('/logout', AuthController.logout);
 
-module.exports = router;
+export default authRoutes;

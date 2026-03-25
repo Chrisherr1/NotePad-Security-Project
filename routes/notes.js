@@ -1,70 +1,22 @@
-// handles backend GET, POST, PUT, & DELETE requests
+import express from 'express';
+import NoteController from '../controllers/NoteController.js';
+import { isAuthenticated } from '../middleware/auth.js';
+import { csrfSynchronisedProtection } from '../middleware/csrf.js';
 
-// import modules
-const express = require('express')
-const router = express.Router()
-const db = require('../config/db')
-const { csrfSynchronisedProtection } = require('../middleware/csrf');
+const notesRoutes = express.Router();
 
+notesRoutes.use(isAuthenticated);
 
-// Middleware to check authentication
-function isAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-    return next();
-    }
-    res.redirect('/');
-}
+// get all notes for the logged in user
+notesRoutes.get('/notes', NoteController.getNotes);
 
-router.use(isAuthenticated)
+// create a new note
+notesRoutes.post('/notes', csrfSynchronisedProtection, NoteController.createNote);
 
-// gets user notes
-router.get("/notes", async (req, res) => {
-    try { 
-        const id = req.user.user_id
-        const notes = await db.getUserNotes(id) 
-        res.send(notes)
-    } catch (error) {
-        res.status(500).send({ error: 'Could not fetch notes'})
-    }
-})
+// update a note
+notesRoutes.put('/notes/:id', csrfSynchronisedProtection, NoteController.updateNote);
 
-// allows user to add a note
-router.post("/notes",csrfSynchronisedProtection, async (req, res) => {
-    try {
-        const { title, content, category, date, user_id } = req.body
-        const note = await db.createNote(title, content, category, date, req.user.user_id)
-        console.log("Note from routes file: ", note)
-        res.status(200).send(note)
-    } catch (error) {
-        console.error('Could not create note:', error)
-        res.status(500).send({ error: 'Could not create note' })
-    }
-})
+// delete a note
+notesRoutes.delete('/notes/:id', csrfSynchronisedProtection, NoteController.deleteNote);
 
-// allows user to update note
-router.put("/notes/:id",csrfSynchronisedProtection, async (req, res) => {
-    try {
-        const id = req.params.id
-        const { title, content, category,pinned } = req.body
-        const note = await db.updateNote(title, content, category,pinned, id)
-        res.status(201).send(note)
-    } catch (error) {
-        console.error('Could not update note:', error)
-        res.status(500).send({ error: 'Could not update note' })
-    }
-})
-
-// allows user to delete a note
-router.delete("/notes/:id",csrfSynchronisedProtection, async (req, res) => {
-    try {
-        const id = parseInt(req.params.id)
-        const result = await db.deleteNote(id)
-        res.status(201).send(result)
-    } catch (error) {
-        console.error('Could not delete note:', error)
-        res.status(500).send({ error: 'Could not delete note' })
-    }
-    
-})
-
-module.exports = router
+export default notesRoutes;

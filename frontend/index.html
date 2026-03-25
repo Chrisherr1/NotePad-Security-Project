@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/stylesheets/login.css">
+
+    <!--
+        login.js is loaded with defer so it runs AFTER the DOM is fully parsed.
+        This is important because login.js attaches event listeners to form elements —
+        if the script ran before the HTML existed, getElementById would return null.
+    -->
+    <script src="/javascripts/login.js" defer></script>
+    <title>NotePad</title>
+</head>
+<body>
+
+    <!-- ============================================================
+         MAIN CONTAINER
+         Holds both the login and signup forms.
+         Only one form is visible at a time — toggled by the
+         showSignup / showLogin links at the bottom of each form.
+         Toggle logic is handled in login.js using classList.add/remove('active')
+         ============================================================ -->
+    <div class="container">
+        <h1>NotePad</h1>
+
+        <!-- ============================================================
+             LOGIN FORM
+             Default view — has the 'active' class on page load
+             Previously used: action='/login' method='POST'
+             Now handled by fetch() in login.js → POST /api/v1/auth/login
+             On success: redirects to /dashboard.html
+             On failure: displays error message returned from the API
+             ============================================================ -->
+        <div id="loginForm" class="form-container active">
+
+            <!--
+                No action= or method= on the form.
+                Submission is intercepted by the event listener in login.js:
+                document.getElementById('loginFormElement').addEventListener('submit', ...)
+                e.preventDefault() stops the browser's default form submission behaviour
+            -->
+            <form id="loginFormElement">
+
+                <!-- Maps to req.body.email in AuthController.login -->
+                <input type="email" id="email" name="email" placeholder="Email" required>
+
+                <!-- Maps to req.body.password in AuthController.login -->
+                <input type="password" id="password" name="password" placeholder="Password" required>
+
+                <button class="btn-primary" type="submit">Login</button>
+            </form>
+
+            <div class="divider">OR</div>
+
+            <!--
+                Google OAuth button — links directly to the backend Google auth route
+                Clicking this navigates the browser to the backend which hands off
+                to Google's OAuth flow. No fetch() needed here — it's a full page redirect.
+                On success: passport redirects to /dashboard.html (set in auth-routes.js)
+                On failure: passport redirects to /index.html (set in auth-routes.js)
+            -->
+            <button class="button-continue-google" type="button">
+                <a href="/api/v1/auth/google">
+                    <img src="/images/continue-with-google.svg" alt="Continue with Google" class="oauth-logo">
+                </a>
+            </button>
+
+            <!--
+                Toggle link — shows the signup form and hides the login form
+                Handler in login.js:
+                document.getElementById('showSignup').addEventListener('click', ...)
+            -->
+            <div class="toggle">
+                <a href="#" id="showSignup">Create account</a>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             SIGNUP FORM
+             Hidden by default — shown when user clicks "Create account"
+             Previously used: action='/signup' method='POST'
+             Now handled by fetch() in login.js → POST /api/v1/auth/signup
+             On success: redirects to /dashboard.html
+             On failure: displays error message returned from the API
+             ============================================================ -->
+        <div id="signupForm" class="form-container">
+
+            <!--
+                No action= or method= on the form.
+                Submission is intercepted by the event listener in login.js:
+                document.getElementById('signupFormElement').addEventListener('submit', ...)
+            -->
+            <form id="signupFormElement">
+
+                <!-- Maps to req.body.name in AuthController.signup -->
+                <input type="text" id="name" name="name" placeholder="Name" required>
+
+                <!-- Maps to req.body.email in AuthController.signup -->
+                <input type="email" id="signupEmail" name="email" placeholder="Email" required>
+
+                <!-- Maps to req.body.password in AuthController.signup -->
+                <input type="password" id="signupPassword" name="password" placeholder="Password" required>
+
+                <button class="btn-primary" type="submit">Create Account</button>
+            </form>
+
+            <div class="divider">OR</div>
+
+            <!--
+                Google OAuth signup button — same route as login Google button.
+                Google OAuth handles both login and signup in one flow.
+                Fixed: original had an unclosed <a> tag inside the button.
+            -->
+            <button class="button-signup-google" type="button">
+                <a href="/api/v1/auth/google">
+                    <img src="/images/Sign-up-with-google.svg" alt="Sign up with Google" class="oauth-logo">
+                </a>
+            </button>
+
+            <!--
+                Toggle link — shows the login form and hides the signup form
+                Handler in login.js:
+                document.getElementById('showLogin').addEventListener('click', ...)
+            -->
+            <div class="toggle">
+                <a href="#" id="showLogin">Back to login</a>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
