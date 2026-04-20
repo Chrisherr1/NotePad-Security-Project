@@ -16,6 +16,9 @@ import path from 'path';
 // initialize express app
 const app = express();
 
+// trust nginx proxy so secure cookies work behind SSL termination
+app.set('trust proxy', 1);
+
 // security headers - sets HTTP security headers using helmet
 app.use(securityHeaders);
 app.use(corsConfig);
