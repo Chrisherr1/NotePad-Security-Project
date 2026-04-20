@@ -1,0 +1,67 @@
+# docker-compose.yml
+# ------------------
+# Wires the Express backend and MySQL together on an internal Docker network.
+# Nginx on the host proxies to the backend container on port 3000.
+# MySQL is never exposed to the outside world.
+
+services:
+
+  # Express backend
+  backend:
+    build: .
+    container_name: notepad-backend
+    restart: unless-stopped
+
+    # map host port 3000 to container port 3000
+    # Nginx proxy_pass points to localhost:3000 on the host
+    ports:
+      - "3000:3000"
+
+    # load all environment variables from .env
+    env_file:
+      - .env
+
+    # wait for MySQL to be healthy before starting the backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    networks:
+      - notepad-network
+
+  # MySQL database
+  mysql:
+    image: mysql:8.0
+    container_name: notepad-mysql
+    restart: unless-stopped
+
+    # MySQL is NOT exposed to the host — internal only
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+    # persist database data across container restarts and rebuilds
+    volumes:
+      - notepad-mysql-data:/var/lib/mysql
+
+    # healthcheck so backend waits until MySQL is actually ready
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+    networks:
+      - notepad-network
+
+# internal network — backend and MySQL can talk to each other
+networks:
+  notepad-network:
+    driver: bridge
+
+# named volume — MySQL data persists even if the container is removed
+volumes:
+  notepad-mysql-data:
