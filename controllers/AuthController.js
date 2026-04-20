@@ -13,18 +13,25 @@ class AuthController {
             }
             
         const user = await UserService.loginUser(email,password);
-
-        req.login(user, (error) => {
-            if(error){
-            return next(error);
+        
+        req.session.regenerate(function(regenerateError) {
+            if (regenerateError) {
+                return next(regenerateError);
             }
+
+            req.login(user, (error) => {
+                if(error){
+                return next(error);
+                }
+            
             return res.status(200).json({
             success: true,
             message: 'Login successful'
         });
     });
+});
         }catch(error) {
-            return res.status(401).json({message: error.message});
+            return res.status(401).json({message: 'Invalid email or password'});
         }
     }
 
@@ -38,7 +45,12 @@ class AuthController {
                 return res.status(400).json({message: 'Name, email and password are required'});
             }
         const user = await UserService.createUser(name, email, password);
-        
+
+        req.session.regenerate(function(regenerateError) {
+            if (regenerateError) {
+                return next(regenerateError);
+            }
+
         req.login(user, (error) => {
             if(error){
                 return next(error);
@@ -47,14 +59,15 @@ class AuthController {
                 {
                 success: true,
                 message:'Account created successfully'
-                }
-            );
-            });
-            }catch(error) {
-                return res.status(400).json({
-                    message:error.message
-                });
 
+            });
+        });
+    });
+            }catch(error) {
+                const message = error.message === 'Email already registered'
+                    ? error.message
+                    : 'Unable to create account. Please try again.';
+                return res.status(400).json({ message });
             }
         }
     

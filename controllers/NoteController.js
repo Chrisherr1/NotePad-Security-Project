@@ -19,7 +19,6 @@
                 res.status(500).send({ error: 'Could not fetch notes' });
             }
         }
-
         // create a new note for the logged in user
         // user_id comes from req.user not req.body for security
         async createNote(req, res) {
@@ -47,8 +46,6 @@
         // id comes from the URL params
         async updateNote(req, res) {
 
-            console.log('req.body:', req.body); // add this
-
             try {
                 if (!req.user?.user_id) { //error handling for unauthenticated user, checks if req.user exists and has a user_id property
                     return res.status(401).send({ error: 'Unauthorized' });
@@ -66,14 +63,10 @@
                     return res.status(400).send({ error: 'Title and content are required' });
                 }
 
-                const existingNote = await NoteRepository.getNoteById(id); //get the note by id to check if it belongs to the user
+                const existingNote = await NoteRepository.getNoteById(id);
 
-                if(!existingNote) { //error handling for note not found, checks if the note with the given id exists in the user's notes
+                if(!existingNote || existingNote.user_id !== req.user.user_id) {
                     return res.status(404).send({ error: 'Note not found' });
-                }
-
-                if(existingNote.user_id !== req.user.user_id) { //error handling for unauthorized note update, checks if the note belongs to the logged in user
-                    return res.status(403).send({ error: 'Forbidden' });
                 }
 
                 const note = await NoteRepository.updateNote(title, content, category, pinned, id);
@@ -96,14 +89,10 @@
                 if(isNaN(id)) { //error handling for invalid id, checks if id is a number
                     return res.status(400).send({ error: 'Invalid note id' });
                 }
-                const existingNote = await NoteRepository.getNoteById(id); //get the note by id to check if it belongs to the user
+                const existingNote = await NoteRepository.getNoteById(id);
 
-                if(!existingNote) { //error handling for note not found, checks if the note with the given id exists in the user's notes
+                if(!existingNote || existingNote.user_id !== req.user.user_id) {
                     return res.status(404).send({ error: 'Note not found' });
-                }
-
-                if(existingNote.user_id !== req.user.user_id) { //error handling for unauthorized note deletion, checks if the note belongs to the logged in user
-                    return res.status(403).send({ error: 'Forbidden' });
                 }
 
                 const result = await NoteRepository.deleteNote(id);
