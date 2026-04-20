@@ -1,4 +1,4 @@
-# NotePad - Security Class Project
+# NotePad - Security Project
 
 A Node.js MVC-style web application using a layered architecture for managing personal notes, built with Express, MySQL, Passport.js, and a static HTML/CSS/JS frontend. Designed to demonstrate secure backend architecture and production-style API design.
 
