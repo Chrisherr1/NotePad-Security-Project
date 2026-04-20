@@ -4,6 +4,7 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.env.dev
 
 # SSL certificates / private keys
 *.pem
@@ -31,6 +32,14 @@ pids/
 *.sql
 *.sqlite
 *.sqlite3
+
+# Cookie exports
+cookie.txt
+cookies.txt
+*.cookies
+
+# Local deploy reference
+DEPLOY.md
 
 # Editor and OS junk
 .vscode/
