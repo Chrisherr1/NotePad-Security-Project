@@ -6,17 +6,16 @@ import { csrfSynchronisedProtection } from '../middleware/csrf.js';
 const notesRoutes = express.Router();
 
 notesRoutes.use(isAuthenticated);
-
 // get all notes for the logged in user
 notesRoutes.get('/notes', NoteController.getNotes);
 
 // create a new note
-notesRoutes.post('/notes', csrfSynchronisedProtection, NoteController.createNote);
+notesRoutes.post('/notes', NoteController.createNote);
 
 // update a note
-notesRoutes.put('/notes/:id', csrfSynchronisedProtection, NoteController.updateNote);
+notesRoutes.put('/notes/:id', NoteController.updateNote);
 
 // delete a note
-notesRoutes.delete('/notes/:id', csrfSynchronisedProtection, NoteController.deleteNote);
+notesRoutes.delete('/notes/:id', NoteController.deleteNote);
 
 export default notesRoutes;

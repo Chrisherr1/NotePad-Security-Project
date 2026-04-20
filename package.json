@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node app.js",
-    "devStart": "nodemon app.js"
+    "start": "node index.js",
+    "devStart": "nodemon index.js"
   },
   "dependencies": {
     "argon2": "^0.44.0",

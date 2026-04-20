@@ -12,6 +12,13 @@
     */
 
     csrfRoutes.get('/csrf', (req, res) => {
+        // session must exist before generating a token
+        // without this, csrf-sync ties the token to an anonymous session
+        // which breaks after the user logs in and gets a new session
+        if(!req.session){
+            return res.status(503).json({ message: " Session unavailable"});
+        }
+
         // generate a CSRF token for the current session and send it to the frontend
         const token = generateToken(req);
         res.json({ csrfToken: token });
