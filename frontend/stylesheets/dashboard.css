@@ -469,3 +469,69 @@ body {
 .empty-state p {
     font-size: 1rem;
 }
+
+/* ================================================================
+   MOBILE
+   ================================================================ */
+
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+}
+
+.hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #404040;
+    border-radius: 2px;
+}
+
+.backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 99;
+}
+
+.backdrop.active {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 100;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .main-header {
+        padding: 16px;
+    }
+
+    .notes-area {
+        padding: 16px;
+    }
+
+    .note-item-actions {
+        opacity: 1;
+    }
+}

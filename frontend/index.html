@@ -61,11 +61,10 @@
                 On success: passport redirects to /dashboard.html (set in auth-routes.js)
                 On failure: passport redirects to /index.html (set in auth-routes.js)
             -->
-            <button class="button-continue-google" type="button">
-                <a href="/api/v1/auth/google">
-                    <img src="/images/continue-with-google.svg" alt="Continue with Google" class="oauth-logo">
-                </a>
-            </button>
+            <a href="https://api.notepad.christianherrera.dev/api/v1/auth/google" class="button-signin-google">
+            <img src="/images/continue-with-google.svg"
+            alt="Sign in with Google" class="oauth-logo">
+            </a>
 
             <!--
                 Toggle link — shows the signup form and hides the login form
@@ -113,11 +112,9 @@
                 Google OAuth handles both login and signup in one flow.
                 Fixed: original had an unclosed <a> tag inside the button.
             -->
-            <button class="button-signup-google" type="button">
-                <a href="/api/v1/auth/google">
-                    <img src="/images/Sign-up-with-google.svg" alt="Sign up with Google" class="oauth-logo">
-                </a>
-            </button>
+            <a href="https://api.notepad.christianherrera.dev/api/v1/auth/google" class="button-signin-google">
+            <img src="/images/Sign-up-with-google.svg" alt="Sign up with Google" class="oauth-logo">
+            </a>
 
             <!--
                 Toggle link — shows the login form and hides the signup form

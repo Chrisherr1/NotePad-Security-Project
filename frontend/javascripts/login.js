@@ -11,7 +11,13 @@
  * This file replaced the old EJS form submissions (action='/login' method='POST')
  * with fetch() calls so we can handle responses without a full page reload.
  */
-const API = ''; // change to '' when deploying
+ //const API = ''; // change to '' when deploying
+
+ // API base URl for production
+const API = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'  // your local backend port
+    : 'https://api.notepad.christianherrera.dev';
+
 /*
  * csrfToken
  * ---------
@@ -22,19 +28,19 @@ const API = ''; // change to '' when deploying
 let csrfToken = null;
 
 /* ================================================================
-   CSRF TOKEN
-   ================================================================
-   Your backend uses csrf-sync to protect POST/PUT/DELETE routes.
-   Before submitting any form, the frontend must:
-     1. Call GET /csrf to get a token tied to the current session
-     2. Send that token back in the 'x-csrf-token' header on every
+    CSRF TOKEN
+    ================================================================
+    Your backend uses csrf-sync to protect POST/PUT/DELETE routes.
+    Before submitting any form, the frontend must:
+    1. Call GET /csrf to get a token tied to the current session
+    2. Send that token back in the 'x-csrf-token' header on every
         mutating request (POST, PUT, DELETE)
-   If the token is missing or wrong, the backend returns 403 Forbidden.
+If the token is missing or wrong, the backend returns 403 Forbidden.
    ================================================================ */
 
 async function getCsrfToken() {
     try {
-        const res = await fetch(`${API}/csrf`, {
+        const res = await fetch(`${API}/api/v1/csrf`, {
             /*
              * credentials: 'include' is required on ALL fetch() calls.
              * Without it, the browser won't send the session cookie,

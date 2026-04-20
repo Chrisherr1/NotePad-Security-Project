@@ -1,89 +1,110 @@
-        body {
-            font-family: Arial, sans-serif;
-            /*background:#2C3E50;*/
-            background-image: url(../images/login-background3.jpg);
-            background-size:cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
+body {
+    font-family: Arial, sans-serif;
+    background-image: url(../images/login-background3.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
 
-        .container {
-            background: #F5F1E8;
-            padding: 40px;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        }
+.container {
+    background: #F5F1E8;
+    padding: 40px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
 
-        h1 {
-            text-align: center;
-            color: #5D4E37;
-            margin-bottom: 30px;
-            font-size: 28px;
-        }
+h1 {
+    text-align: center;
+    color: #5D4E37;
+    margin-bottom: 30px;
+    font-size: 28px;
+}
 
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
 
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-        }
+button {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
 
-        .btn-primary {
-            background: #8B7355;
-            color: white;
-        }
+.btn-primary {
+    background: #8B7355;
+    color: white;
+}
 
-        .btn-primary:hover {
-            background: #6F5B44;
-        }
+.btn-primary:hover {
+    background: #6F5B44;
+}
 
-        .btn-oauth {
-            background: white;
-            color: #333;
-            border: 1px solid #ddd;
-        }
+.divider {
+    text-align: center;
+    margin: 20px 0;
+    color: #999;
+}
 
-        .divider {
-            text-align: center;
-            margin: 20px 0;
-            color: #999;
-        }
+.toggle {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
 
-        .toggle {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-        }
+.toggle a {
+    color: #4A90E2;
+    text-decoration: none;
+}
 
-        .toggle a {
-            color: #4A90E2;
-            text-decoration: none;
-        }
+.form-container {
+    display: none;
+}
 
-        .form-container {
-            display: none;
-        }
+.form-container.active {
+    display: block;
+}
 
-        .form-container.active {
-            display: block;
-        }
+.button-signin-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.button-signin-google:hover {
+        
+}
+
+.oauth-logo {
+    width: 160px;
+    height: auto;
+}

@@ -1,238 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NotePad Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NotePad Dashboard</title>
 
-    <!-- Dashboard styles -->
-    <link rel="stylesheet" href="/stylesheets/dashboard.css">
+<!-- Dashboard styles -->
+<link rel="stylesheet" href="/stylesheets/dashboard.css">
 
-    <!--
-        dashboard.js is loaded with defer so it runs AFTER the DOM is fully parsed.
-        This means all getElementById calls inside the script will work correctly.
-        Without defer, the script would run before the HTML elements exist.
-    -->
-    <script src="/javascripts/dashboard.js" defer></script>
+<!--
+    dashboard.js is loaded with defer so it runs AFTER the DOM is fully parsed.
+    This means all getElementById calls inside the script will work correctly.
+    Without defer, the script would run before the HTML elements exist.
+-->
+<script src="/javascripts/dashboard.js" defer></script>
 </head>
 <body>
-    <div class="app-container">
+<div class="app-container">
 
-        <!-- ============================================================
-             SIDEBAR
-             Contains: logo, new note button, navigation filters, user info
-             ============================================================ -->
-        <div class="sidebar">
+    <!-- ============================================================
+            SIDEBAR
+            Contains: logo, new note button, navigation filters, user info
+            ============================================================ -->
+    <div class="sidebar" id="sidebar">
 
-            <!-- Sidebar top: logo + new note button -->
-            <div class="sidebar-header">
-                <div class="logo">NotePad</div>
+        <!-- Sidebar top: logo + new note button -->
+        <div class="sidebar-header">
+            <div class="logo">NotePad</div>
+
+            <!--
+                openModal() is defined in dashboard.js
+                Called with no arguments = create mode (no note id passed)
+                When editing, openModal(id) is called from the note card
+            -->
+            <button class="new-note-btn" onclick="openModal()">
+                <span>+</span>
+                <span>New Note</span>
+            </button>
+        </div>
+
+        <!-- Navigation filters -->
+        <div class="sidebar-nav">
+
+            <!-- Views section: All Notes and Pinned -->
+            <div class="nav-section">
+                <div class="nav-section-title">Views</div>
 
                 <!--
-                    openModal() is defined in dashboard.js
-                    Called with no arguments = create mode (no note id passed)
-                    When editing, openModal(id) is called from the note card
+                    filterNotes(filter, element) is defined in dashboard.js
+                    'filter' tells the function what to filter by (all, pinned, category name)
+                    'this' passes the clicked element so we can toggle the active class on it
+                    Counts are updated by updateCounts() in dashboard.js after notes load
                 -->
-                <button class="new-note-btn" onclick="openModal()">
-                    <span>+</span>
-                    <span>New Note</span>
-                </button>
-            </div>
-
-            <!-- Navigation filters -->
-            <div class="sidebar-nav">
-
-                <!-- Views section: All Notes and Pinned -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Views</div>
-
-                    <!--
-                        filterNotes(filter, element) is defined in dashboard.js
-                        'filter' tells the function what to filter by (all, pinned, category name)
-                        'this' passes the clicked element so we can toggle the active class on it
-                        Counts are updated by updateCounts() in dashboard.js after notes load
-                    -->
-                    <div class="nav-item active" onclick="filterNotes('all', this)">
-                        <span class="nav-item-label">
-                            <span>All Notes</span>
-                        </span>
-                        <span class="nav-item-count" id="allCount">0</span>
-                    </div>
-
-                    <div class="nav-item" onclick="filterNotes('pinned', this)">
-                        <span class="nav-item-label">
-                            <span>Pinned</span>
-                        </span>
-                        <span class="nav-item-count" id="pinnedCount">0</span>
-                    </div>
+                <div class="nav-item active" onclick="filterNotes('all', this)">
+                    <span class="nav-item-label">
+                        <span>All Notes</span>
+                    </span>
+                    <span class="nav-item-count" id="allCount">0</span>
                 </div>
 
-                <!-- Categories section: matches category values in the create/edit modal -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Categories</div>
-
-                    <div class="nav-item" onclick="filterNotes('personal', this)">
-                        <span class="nav-item-label">
-                            <span>Personal</span>
-                        </span>
-                        <span class="nav-item-count" id="personalCount">0</span>
-                    </div>
-
-                    <div class="nav-item" onclick="filterNotes('work', this)">
-                        <span class="nav-item-label">
-                            <span>Work</span>
-                        </span>
-                        <span class="nav-item-count" id="workCount">0</span>
-                    </div>
-
-                    <div class="nav-item" onclick="filterNotes('ideas', this)">
-                        <span class="nav-item-label">
-                            <span>Ideas</span>
-                        </span>
-                        <span class="nav-item-count" id="ideasCount">0</span>
-                    </div>
-
-                    <div class="nav-item" onclick="filterNotes('todo', this)">
-                        <span class="nav-item-label">
-                            <span>To-Do</span>
-                        </span>
-                        <span class="nav-item-count" id="todoCount">0</span>
-                    </div>
+                <div class="nav-item" onclick="filterNotes('pinned', this)">
+                    <span class="nav-item-label">
+                        <span>Pinned</span>
+                    </span>
+                    <span class="nav-item-count" id="pinnedCount">0</span>
                 </div>
             </div>
 
-            <!-- ============================================================
-                 SIDEBAR FOOTER — User info + logout
-                 Previously used EJS: <%= user.name.charAt(0) %> and <%= user.name.split(' ')[0] %>
-                 Now these are empty and populated by loadUser() in dashboard.js
-                 after fetching GET /api/v1/auth/user
-                 ============================================================ -->
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <!--
-                        userAvatar: shows the first letter of the user's name
-                        Populated by: document.getElementById('userAvatar').textContent = user.name.charAt(0)
-                    -->
-                    <div class="user-avatar" id="userAvatar"></div>
+            <!-- Categories section: matches category values in the create/edit modal -->
+            <div class="nav-section">
+                <div class="nav-section-title">Categories</div>
 
-                    <!--
-                        userName: shows the user's first name
-                        Populated by: document.getElementById('userName').textContent = user.name.split(' ')[0]
-                    -->
-                    <div class="user-name" id="userName"></div>
+                <div class="nav-item" onclick="filterNotes('personal', this)">
+                    <span class="nav-item-label">
+                        <span>Personal</span>
+                    </span>
+                    <span class="nav-item-count" id="personalCount">0</span>
                 </div>
 
-                <!--
-                    logout() is defined in dashboard.js
-                    It calls POST /api/v1/auth/logout with the CSRF token
-                    then redirects to /login.html on success
-                    Previously this was a form with action="/logout" method="POST"
-                    Now it's a fetch() call so we stay in control of the redirect
-                -->
-                <button class="logout-btn" onclick="logout()">Logout</button>
+                <div class="nav-item" onclick="filterNotes('work', this)">
+                    <span class="nav-item-label">
+                        <span>Work</span>
+                    </span>
+                    <span class="nav-item-count" id="workCount">0</span>
+                </div>
+
+                <div class="nav-item" onclick="filterNotes('ideas', this)">
+                    <span class="nav-item-label">
+                        <span>Ideas</span>
+                    </span>
+                    <span class="nav-item-count" id="ideasCount">0</span>
+                </div>
+
+                <div class="nav-item" onclick="filterNotes('todo', this)">
+                    <span class="nav-item-label">
+                        <span>To-Do</span>
+                    </span>
+                    <span class="nav-item-count" id="todoCount">0</span>
+                </div>
             </div>
         </div>
 
         <!-- ============================================================
-             MAIN CONTENT
-             Contains: search bar, notes grid
-             ============================================================ -->
-        <div class="main-content">
-            <div class="main-header">
-                <div class="search-container">
-                    <!--
-                        Search is handled client-side in dashboard.js
-                        The 'input' event listener filters allNotes[] in memory
-                        No API call is made on search — we filter the already-loaded notes
-                    -->
-                    <input type="text" class="search-box" id="searchBox" placeholder="Search notes...">
-                </div>
+                SIDEBAR FOOTER — User info + logout
+                Previously used EJS: <%= user.name.charAt(0) %> and <%= user.name.split(' ')[0] %>
+                Now these are empty and populated by loadUser() in dashboard.js
+                after fetching GET /api/v1/auth/user
+                ============================================================ -->
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <!--
+                    userAvatar: shows the first letter of the user's name
+                    Populated by: document.getElementById('userAvatar').textContent = user.name.charAt(0)
+                -->
+                <div class="user-avatar" id="userAvatar"></div>
+
+                <!--
+                    userName: shows the user's first name
+                    Populated by: document.getElementById('userName').textContent = user.name.split(' ')[0]
+                -->
+                <div class="user-name" id="userName"></div>
             </div>
 
-            <div class="notes-area">
-                <!--
-                    notesList: empty on page load
-                    Populated by renderNotes() in dashboard.js after loadNotes() fetches
-                    GET /api/v1/notes and receives the notes array from the backend
-                -->
-                <div class="notes-list" id="notesList"></div>
-            </div>
+            <!--
+                logout() is defined in dashboard.js
+                It calls POST /api/v1/auth/logout with the CSRF token
+                then redirects to /login.html on success
+                Previously this was a form with action="/logout" method="POST"
+                Now it's a fetch() call so we stay in control of the redirect
+            -->
+            <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </div>
 
     <!-- ============================================================
-         MODAL — Create / Edit Note
-         Used for both creating new notes and editing existing ones
-         openModal()    = create mode  (no id, empty form)
-         openModal(id)  = edit mode    (pre-fills form with existing note data)
-         closeModal()   = hides modal and resets currentNoteId to null
-         saveNote(event)= handles both POST (create) and PUT (edit) based on currentNoteId
-         ============================================================ -->
-    <div class="modal" id="noteModal">
-        <div class="modal-content">
-            <div class="modal-header">
+            MAIN CONTENT
+            Contains: search bar, notes grid
+            ============================================================ -->
+    <div class="main-content">
+        <div class="main-header">
+
+            <!-- Hamburger button — only visible on mobile via CSS -->
+            <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="search-container">
                 <!--
-                    modalTitle text is set dynamically in dashboard.js:
-                    - Create mode: "Create New Note"
-                    - Edit mode:   "Edit Note"
+                    Search is handled client-side in dashboard.js
+                    The 'input' event listener filters allNotes[] in memory
+                    No API call is made on search — we filter the already-loaded notes
                 -->
-                <h2 class="modal-title" id="modalTitle">Create New Note</h2>
-                <button class="close-btn" onclick="closeModal()">&times;</button>
+                <input type="text" class="search-box" id="searchBox" placeholder="Search notes...">
             </div>
+        </div>
 
+        <div class="notes-area">
             <!--
-                onsubmit="saveNote(event)" — prevents default form submission
-                and delegates to the saveNote() function in dashboard.js
-                saveNote() decides whether to POST or PUT based on currentNoteId
+                notesList: empty on page load
+                Populated by renderNotes() in dashboard.js after loadNotes() fetches
+                GET /api/v1/notes and receives the notes array from the backend
             -->
-            <form onsubmit="saveNote(event)">
-                <div class="modal-body">
-
-                    <!-- Note title input — maps to req.body.title in the backend -->
-                    <div class="form-group">
-                        <label>Title
-                            <input type="text" id="noteTitle" required placeholder="Untitled">
-                        </label>
-                    </div>
-
-                    <!--
-                        Category select — maps to req.body.category in the backend
-                        Values must match the category filter values in the sidebar nav
-                        and the category field in your database schema
-                    -->
-                    <div class="form-group">
-                        <label>Category
-                            <select id="noteCategory">
-                                <option value="personal">Personal</option>
-                                <option value="work">Work</option>
-                                <option value="ideas">Ideas</option>
-                                <option value="todo">To-Do</option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <!-- Note content textarea — maps to req.body.content in the backend -->
-                    <div class="form-group">
-                        <label>Content
-                            <textarea id="noteContent" required placeholder="Start writing..."></textarea>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <!-- Cancel just closes the modal without saving -->
-                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-
-                    <!--
-                        type="submit" triggers the form's onsubmit handler (saveNote)
-                        Removed the old onclick="location.reload()" — dashboard.js
-                        now calls loadNotes() after a successful save to refresh the list
-                    -->
-                    <button type="submit" class="btn-save">Save Note</button>
-                </div>
-            </form>
+            <div class="notes-list" id="notesList"></div>
         </div>
     </div>
+</div>
+
+<!-- Backdrop — closes sidebar when tapped outside on mobile -->
+<div class="backdrop" id="backdrop" onclick="toggleSidebar()"></div>
+
+<!-- ============================================================
+        MODAL — Create / Edit Note
+        Used for both creating new notes and editing existing ones
+        openModal()    = create mode  (no id, empty form)
+        openModal(id)  = edit mode    (pre-fills form with existing note data)
+        closeModal()   = hides modal and resets currentNoteId to null
+        saveNote(event)= handles both POST (create) and PUT (edit) based on currentNoteId
+        ============================================================ -->
+<div class="modal" id="noteModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <!--
+                modalTitle text is set dynamically in dashboard.js:
+                - Create mode: "Create New Note"
+                - Edit mode:   "Edit Note"
+            -->
+            <h2 class="modal-title" id="modalTitle">Create New Note</h2>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+
+        <!--
+            onsubmit="saveNote(event)" — prevents default form submission
+            and delegates to the saveNote() function in dashboard.js
+            saveNote() decides whether to POST or PUT based on currentNoteId
+        -->
+        <form onsubmit="saveNote(event)">
+            <div class="modal-body">
+
+                <!-- Note title input — maps to req.body.title in the backend -->
+                <div class="form-group">
+                    <label>Title
+                        <input type="text" id="noteTitle" required placeholder="Untitled">
+                    </label>
+                </div>
+
+                <!--
+                    Category select — maps to req.body.category in the backend
+                    Values must match the category filter values in the sidebar nav
+                    and the category field in your database schema
+                -->
+                <div class="form-group">
+                    <label>Category
+                        <select id="noteCategory">
+                            <option value="personal">Personal</option>
+                            <option value="work">Work</option>
+                            <option value="ideas">Ideas</option>
+                            <option value="todo">To-Do</option>
+                        </select>
+                    </label>
+                </div>
+
+                <!-- Note content textarea — maps to req.body.content in the backend -->
+                <div class="form-group">
+                    <label>Content
+                        <textarea id="noteContent" required placeholder="Start writing..."></textarea>
+                    </label>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <!-- Cancel just closes the modal without saving -->
+                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+
+                <!--
+                    type="submit" triggers the form's onsubmit handler (saveNote)
+                    Removed the old onclick="location.reload()" — dashboard.js
+                    now calls loadNotes() after a successful save to refresh the list
+                -->
+                <button type="submit" class="btn-save">Save Note</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 </body>
 </html>
